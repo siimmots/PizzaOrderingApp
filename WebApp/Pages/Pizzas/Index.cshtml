@@ -1,0 +1,106 @@
+@page
+@model WebApp.Pages.Pizzas.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+@if (Model.Confirmed != null)
+{
+    <script type="text/javascript">
+        alert("Your order has been confirmed!");
+        location.replace("../Index");
+    </script>
+}
+
+<h1>Pizzas</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+
+<form class="form-inline" method="get">
+    <label asp-for="SearchName" class="my-1 mb-3 mr-2">Name</label>
+    <input asp-for="SearchName" class="form-control mb-2 mr-sm-2" />
+    <label asp-for="SearchDescription" class="my-1 mb-3  mr-2">Description</label>
+    <input asp-for="SearchDescription" class="form-control mb-2 mr-sm-2" />
+    <label asp-for="SearchCategories" class="my-1 mb-3 mr-2">Category</label>
+    <input asp-for="SearchCategories" class="form-control mb-2 mr-sm-2" />
+    <label asp-for="SearchToppings" class="my-1 mb-3 mr-2">Toppings</label>
+    <input asp-for="SearchToppings" class="form-control mb-2 mr-sm-2" />
+    
+    <input type="hidden" name="clientId" asp-for="ClientId"/>
+    <input asp-for="Btn" type="submit" value="Search" class="btn btn-primary mr-2 mb-2 my-1" />
+    @if (!string.IsNullOrWhiteSpace(Model.SearchName) || !string.IsNullOrWhiteSpace(Model.SearchDescription)
+         || !string.IsNullOrWhiteSpace(Model.SearchCategories) || !string.IsNullOrWhiteSpace(Model.SearchToppings))
+    {
+        <input asp-for="Btn" type="submit" value="Reset" class="btn btn-primary mb-2 my-1" />
+    }
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Pizza[0].Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Pizza[0].Description)
+            </th>
+            <th>
+                @("Price (€)")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Pizza[0].Category)
+            </th>
+            <th>
+                @("Calories (kcal)")
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Pizza) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @if (item.Description.Length > 20)
+                {
+                    @(item.Description.Substring(0, 17) + "...")
+                }
+                else
+                {
+                    @Html.DisplayFor(modelItem => item.Description)
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category!.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Calories)
+            </td>
+            <td>
+                @if (Model.ClientId != null)
+                {
+                    <a asp-page="/Orders/Create"
+                       class="btn btn-primary"
+                       asp-route-clientId=@Model.ClientId
+                       asp-route-pizzaId="@item.Id">Add to order</a>
+                }
+                else
+                {
+                    <a asp-page="/Orders/Create" class="btn btn-danger" asp-route-pizzaId="@item.Id">Order</a> @("|")
+                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> @("|")
+                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> @("|")
+                    <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,109 @@
+@page
+@using Domain
+@model WebApp.Pages.Orders.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+@functions
+{
+    string GetToppingsString(ICollection<Topping> toppings)
+    {
+        var result = "";
+
+        for (var i = 0; i < toppings.Count; i++)
+        {
+            result += toppings.ToList()[i].Name;
+            if (i != toppings.Count - 1)
+            {
+                result += ",";
+            }
+        }
+
+        return result;
+    }
+    
+    int GetToppingsCalories(ICollection<Topping> toppings)
+    {
+        return toppings.Sum(topping => topping.Calories);
+    }
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Order</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Order.Price)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Order.Price)
+        </dd>
+        <dt class="col-sm-2">
+            @("Order completed")
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Order.IsCompleted)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Order.Client)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Order.Client!.FirstName)
+        </dd>
+        <dt class="col-sm-2">
+            @("Clients phone")
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Order.Client!.PhoneNr)
+        </dd>
+        
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Order.Pizza)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Order.Pizza!.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @("Pizza toppings")
+        </dt>
+        <dd class="col-sm-10">
+            @GetToppingsString(Model.Toppings!)
+        </dd>
+        <dt class="col-sm-2">
+            @("Extra toppings")
+        </dt>
+        <dd class="col-sm-10">
+            @for (var i = 0; i < Model.Extras!.Count; i++)
+            {
+                <a asp-page="/OrderExtras/Edit" asp-route-clientId="@Model.ClientId" asp-route-orderId="@Model.Order.Id" asp-route-id="@Model.Extras!.ToArray()[i].Id">@Model.Extras!.ToArray()[i].Topping!.Name</a>
+                if (i != Model.Extras!.Count - 1)
+                {
+                    @(",")
+                }
+            }
+        </dd>
+        <dt class="col-sm-2">
+            @("Calories with extras")
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Order.Pizza!.Calories + @Model.Extras!.Sum(extra => extra.Topping!.Calories)
+        </dd>
+    </dl>
+</div>
+<div>
+    
+    @if (Model.Order.IsCompleted)
+    {
+        <a asp-page="./Edit" asp-route-id="@Model.Order.ClientId">Edit</a> @("|")
+        <a asp-page="./Index">Back to the List</a>
+
+    }
+    else
+    {
+        <a asp-page="/Orders/Create" asp-route-clientId="@Model.ClientId" asp-route-pizzaId="@Model.PizzaId" asp-route-orderId="@Model.OrderId">Back to the Order</a>
+
+    }
+</div>

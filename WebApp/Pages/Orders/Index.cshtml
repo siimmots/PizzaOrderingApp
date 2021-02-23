@@ -1,0 +1,63 @@
+@page
+@model WebApp.Pages.Orders.IndexModel
+
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<h1>All orders</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].Price)
+            </th>
+            <th>
+                @("Completed")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].Client)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].Pizza)
+            </th>
+            <th>
+                @("Created at")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Order.Reverse()) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsCompleted)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Client!.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Pizza!.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                @if (item.IsCompleted == false)
+                {
+                    <a asp-page="/Orders/Create" asp-route-clientId="@item.Client!.Id" asp-route-pizzaId="@item.Pizza!.Id" asp-route-orderId="@item.Id">Finalize</a> @("|")
+                }
+                else
+                {
+                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> @("|")
+                }
+                <a asp-page="./Details" asp-route-orderId="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-orderId="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
